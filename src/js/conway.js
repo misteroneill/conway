@@ -1,9 +1,9 @@
-import Canvas from './canvas';
+import Grid from './grid';
 
-const canvas = new Canvas();
+const grid = new Grid();
 
 const conway = window.conway = {
-  canvas: canvas
+  grid: grid
 };
 
-canvas.setup();
+grid.setup();

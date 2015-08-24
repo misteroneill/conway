@@ -5,26 +5,14 @@ const CELL_GAP = 4;
 const CELL_SIZE = 10;
 const CELL_OFFSET = CELL_GAP + CELL_SIZE;
 
-const COLOR_CANVAS = 'rgba(0, 0, 0, 1)';
+const COLOR_GRID = 'rgba(0, 0, 0, 1)';
 const COLOR_CELL_DEAD = 'rgba(255, 255, 255, 0.333)';
 const COLOR_CELL_ALIVE = 'rgba(255, 255, 255, 1)';
 
-/**
- * Returns the full size (height and width) of the game canvas.
- *
- * @return {Object}
- */
-function getCanvasSize() {
-  return {
-    height: document.body.clientHeight,
-    width: document.body.clientWidth
-  };
-}
-
-export default class Canvas {
+export default class Grid {
 
   constructor() {
-    this.grid = [
+    this._data = [
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -43,7 +31,7 @@ export default class Canvas {
     this.context = this.el.getContext('2d');
 
     this.resize = _.throttle(function resize() {
-      dom.setAttrs(this.el, getCanvasSize());
+      dom.setAttrs(this.el, this.getSize());
       this.draw();
     }, 250).bind(this);
 
@@ -73,14 +61,14 @@ export default class Canvas {
   }
 
   draw() {
-    let size = getCanvasSize();
+    let size = this.getSize();
 
-    this.context.fillStyle = COLOR_CANVAS;
+    this.context.fillStyle = COLOR_GRID;
     this.context.fillRect(0, 0, size.width, size.height);
 
     let y = CELL_GAP;
 
-    this.grid.forEach(function (row) {
+    this._data.forEach(function (row) {
       let x = CELL_GAP;
 
       row.forEach(function (cell) {
@@ -96,5 +84,12 @@ export default class Canvas {
     }, this);
 
     return this;
+  }
+
+  getSize() {
+    return {
+      height: document.body.clientHeight,
+      width: document.body.clientWidth
+    };
   }
 }
