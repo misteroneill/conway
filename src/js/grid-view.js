@@ -24,21 +24,11 @@ export default class GridView {
 
   constructor () {
     this.model = new GridModel();
-  }
-
-  setup () {
     this.el = document.createElement('canvas');
     this.context = this.el.getContext('2d');
     this.resize = _.throttle(resize, 500).bind(this);
-    window.addEventListener('resize', this.resize);
     this.resize();
     document.body.appendChild(this.el);
-  }
-
-  teardown () {
-    document.body.removeChild(this.el);
-    window.removeEventListener('resize', this.resize);
-    this.el = this.resize = null;
   }
 
   draw () {
