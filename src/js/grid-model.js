@@ -62,6 +62,55 @@ export default class GridModel {
   }
 
   /**
+   * Get a single cell value from the model's data.
+   *
+   * @param  {Number} row
+   * @param  {Number} col
+   * @return {Number|null}
+   *         The value at the column and row given (or null).
+   */
+  getCell (row, col) {
+    let r = store.get(this)[row];
+    return Array.isArray(r) && _.isNumber(r[col]) ? r[col] : null;
+  }
+
+  /**
+   * Set a single cell value in the model's data. The value is only set if
+   * the cell exists.
+   *
+   * @param  {Number} row
+   * @param  {Number} col
+   * @param  {Number|Boolean} value
+   *         Treated as truthy/falsy, set as one/zero respectively.
+   * @return {Number|null}
+   */
+  setCell (row, col, value) {
+    let current = this.getCell(col, row);
+    if (current === null) {
+      return current;
+    }
+    let updated = value ? 1 : 0;
+    store.get(this)[row][col] = updated;
+    return updated;
+  }
+
+  /**
+   * Flip the value of a single cell between zero or one. The value is only
+   * set if the cell exists.
+   *
+   * @param {Number} row
+   * @param {Number} col
+   * @return {Number|null}
+   */
+  flipCell (row, col) {
+    let value = this.getCell(col, row);
+    if (value === null) {
+      return value;
+    }
+    return this.setCell(col, row, !value);
+  }
+
+  /**
    * Resize the model data. Newly created rows/cells will be populated with
    * zeros.
    *
