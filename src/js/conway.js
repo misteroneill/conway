@@ -1,6 +1,6 @@
-import Grid from './grid';
+import GridView from './grid-view';
 
-const grid = new Grid();
+const grid = new GridView();
 
 const conway = window.conway = {
   grid: grid
