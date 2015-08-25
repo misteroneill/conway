@@ -85,7 +85,7 @@ export default class GridModel {
    * @return {Number|null}
    */
   setCell (row, col, value) {
-    let current = this.getCell(col, row);
+    let current = this.getCell(row, col);
     if (current === null) {
       return current;
     }
@@ -103,11 +103,11 @@ export default class GridModel {
    * @return {Number|null}
    */
   flipCell (row, col) {
-    let value = this.getCell(col, row);
+    let value = this.getCell(row, col);
     if (value === null) {
       return value;
     }
-    return this.setCell(col, row, !value);
+    return this.setCell(row, col, !value);
   }
 
   /**
