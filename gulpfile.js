@@ -1,5 +1,7 @@
 'use strict';
 
+require('babel/register');
+
 var babelify = require('babelify');
 var browserify = require('browserify');
 var del = require('del');
@@ -10,6 +12,7 @@ var buffer = require('vinyl-buffer');
 var gulp = require('gulp');
 var less = require('gulp-less');
 var gls = require('gulp-live-server');
+var mocha = require('gulp-mocha');
 var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
 var uglify = require('gulp-uglify');
@@ -46,6 +49,16 @@ gulp.task('js', ['clean'], function () {
     .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist/js/'));
+});
+
+gulp.task('test', function () {
+  return gulp.src([
+    'tests/**.test.js'
+  ], {read: false})
+    .pipe(mocha())
+    .on('error', function (err) {
+      throw err;
+    });
 });
 
 gulp.task('watch', function () {

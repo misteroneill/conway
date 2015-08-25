@@ -5,8 +5,8 @@ const store = new WeakMap();
 
 export default class GridModel {
 
-  constructor () {
-    store.set(this, [[0]]);
+  constructor (data) {
+    store.set(this, Array.isArray(data) ? _.cloneDeep(data) : [[0]]);
   }
 
   data () {
