@@ -6,7 +6,7 @@ class Conway {
    * Conway constructor.
    *
    * @constructor
-   * @param  {Number} speed
+   * @param       {Number} speed
    */
   constructor (speed) {
     this.grid = new GridView();

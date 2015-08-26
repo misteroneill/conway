@@ -152,10 +152,55 @@ export default class GridModel {
   }
 
   /**
-   * Births/kills cells based on the rules of Conway's Game of Life.
+   * Algorithm to manage cells based on the rules of Conway's Game of Life.
    *
-   * @see https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#Rules
+   * @see     https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#Rules
+   * @method  tick
    */
   tick () {
+
+    // We want a clone of the data here so that we can change the internal
+    // data without affecting the results of the algorithm.
+    let clone = this.data();
+
+    for (let i = 0; i < clone.length; i++) {
+      let thisRow = clone[i];
+      let prevRow = clone[i - 1];
+      let nextRow = clone[i + 1];
+
+      for (let j = 0; j < thisRow.length; j++) {
+        let thisCell = thisRow[j];
+        let hasPrevCell = _.isNumber(thisRow[j - 1]);
+        let hasNextCell = _.isNumber(thisRow[j + 1]);
+        let livingNeighbors = 0;
+
+        if (hasPrevCell) {
+          livingNeighbors += prevRow ? prevRow[j - 1] : 0;  // left, up
+          livingNeighbors += thisRow[j - 1];                // left
+          livingNeighbors += nextRow ? nextRow[j - 1] : 0;  // left, down
+        }
+
+        livingNeighbors += prevRow ? prevRow[j] : 0;        // up
+        livingNeighbors += nextRow ? nextRow[j] : 0;        // down
+
+        if (hasNextCell) {
+          livingNeighbors += prevRow ? prevRow[j + 1] : 0;  // right, up
+          livingNeighbors += thisRow[j + 1];                // right
+          livingNeighbors += nextRow ? nextRow[j + 1] : 0;  // right, down
+        }
+
+        // Any live cell with fewer than two live neighbours dies, as if
+        // caused by under-population. Any live cell with more than three
+        // live neighbours dies, as if by overcrowding.
+        if (thisCell && (livingNeighbors < 2 || livingNeighbors > 3)) {
+          this.setCell(i, j, 0);
+
+        // Any dead cell with exactly three live neighbours becomes a live
+        // cell, as if by reproduction.
+        } else if (!thisCell && livingNeighbors === 3) {
+          this.setCell(i, j, 1);
+        }
+      }
+    }
   }
 }
