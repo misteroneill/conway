@@ -1,7 +1,12 @@
+'use strict';
+
 import _ from 'lodash';
 import GridView from './grid-view';
 
-const DEFAULT_SPEED = 500;
+const DEFAULT_SPEED = 250;
+
+// Private data store for Conway instances.
+const store = new WeakMap();
 
 class Conway {
 
@@ -9,17 +14,23 @@ class Conway {
    * Conway constructor.
    *
    * @constructor
-   * @param       {Number} speed
    */
-  constructor (speed) {
-    this.grid = new GridView();
-    this._playing = false;
-    this._tick = {
-      count: 0,
-      speed: speed || DEFAULT_SPEED,
-      timestamp: 0,
-    };
-    window.addEventListener('resize', this.grid.resize);
+  constructor () {
+    let grid = new GridView();
+
+    store.set(this, {
+      grid: grid,
+      playing: false,
+      tick: {
+        count: 0,
+        speed: DEFAULT_SPEED,
+        timestamp: 0,
+      }
+    });
+
+    this.tick = this.tick.bind(this);
+
+    window.addEventListener('resize', grid.resize);
   }
 
   /**
@@ -28,7 +39,8 @@ class Conway {
    * @method  togglePlaying
    */
   playing () {
-    this._playing = !this._playing;
+    let data = store.get(this);
+    data.playing = !data.playing;
   }
 
   /**
@@ -37,8 +49,9 @@ class Conway {
    * @method genocide
    */
   genocide (...args) {
-    this.grid.model.genocide(...args);
-    this.grid.draw();
+    let grid = store.get(this).grid;
+    grid.model.genocide(...args);
+    grid.draw();
   }
 
   /**
@@ -49,20 +62,30 @@ class Conway {
    *         A number from zero to one, representing the ratio of living cells.
    */
   randomize (...args) {
-    this.grid.model.randomize(...args);
-    this.grid.draw();
+    let grid = store.get(this).grid;
+    grid.model.randomize(...args);
+    grid.draw();
   }
 
   /**
    * Set the speed of the ticks in milliseconds.
    *
    * @param  {Number} [ms]
-   *         Finite number of milliseconds above zero
+   *         Finite number of milliseconds above zero. If not given (or an
+   *         otherwise invalid value), the internal value is set back to the
+   *         default.
    */
   speed (ms) {
-    if (ms && _.isFinite(ms)) {
-      this._tick.speed = ms;
-    }
+    store.get(this).tick.speed = (ms > 0 && _.isFinite(ms)) ? ms : DEFAULT_SPEED;
+  }
+
+  /**
+   * Retrieve a count of generations passed so far.
+   *
+   * @return {Number}
+   */
+  generations () {
+    return store.get(this).tick.count;
   }
 
   /**
@@ -73,13 +96,14 @@ class Conway {
    * @param   {NUmber} timestamp
    */
   tick (timestamp) {
-    if (this._playing && timestamp - this._tick.timestamp >= this._tick.speed) {
-      this._tick.count++;
-      this.grid.model.tick();
-      this.grid.draw();
-      this._tick.timestamp = timestamp;
+    let data = store.get(this);
+    if (data.playing && timestamp - data.tick.timestamp >= data.tick.speed) {
+      data.tick.count++;
+      data.grid.model.tick();
+      data.grid.draw();
+      data.tick.timestamp = timestamp;
     }
-    window.requestAnimationFrame(this.tick.bind(this));
+    window.requestAnimationFrame(this.tick);
   }
 };
 
