@@ -62,6 +62,43 @@ export default class GridModel {
   }
 
   /**
+   * Kills all cells.
+   *
+   * @method genocide
+   */
+  genocide () {
+    let data = store.get(this);
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        data[i][j] = 0;
+      }
+    }
+  }
+
+  /**
+   * Randomizes all cells with an optional weight.
+   *
+   * @method randomize
+   * @param  {Number} [weight]
+   *         A number from zero to one, representing the ratio of living cells.
+   */
+  randomize (weight) {
+    if (!_.isNumber(weight) || weight < 0 || weight > 1) {
+      weight = 0.5;
+    }
+    if (weight === 0) {
+      this.genocide();
+    } else {
+      let data = store.get(this);
+      for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < data[i].length; j++) {
+          data[i][j] = Math.random() <= weight ? 1 : 0;
+        }
+      }
+    }
+  }
+
+  /**
    * Get a single cell value from the model's data.
    *
    * @param  {Number} row
