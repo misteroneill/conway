@@ -1,6 +1,5 @@
-'use strict';
-
 import _ from 'lodash';
+import Controls from './controls';
 import GridView from './grid-view';
 
 const DEFAULT_SPEED = 250;
@@ -16,9 +15,11 @@ class Conway {
    * @constructor
    */
   constructor () {
+    let controls = new Controls(this);
     let grid = new GridView();
 
     store.set(this, {
+      controls: controls,
       grid: grid,
       playing: false,
       tick: {

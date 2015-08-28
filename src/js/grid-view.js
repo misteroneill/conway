@@ -2,7 +2,7 @@ import _ from 'lodash';
 import dom from './lib/dom';
 import GridModel from './grid-model';
 
-const CELL_GAP = 4;
+const CELL_GAP = 3;
 const CELL_SIZE = 12;
 const CELL_OFFSET = CELL_GAP + CELL_SIZE;
 
@@ -33,8 +33,7 @@ export default class GridView {
    */
   constructor () {
     this.model = new GridModel();
-    this.el = document.createElement('canvas');
-    this.el.classList.add('cgol');
+    this.el = dom.el('canvas', {'class': 'grid'});
     this.el.addEventListener('click', this.handleClick.bind(this));
     this.context = this.el.getContext('2d');
     this.resize = _.throttle(resize, 500).bind(this);

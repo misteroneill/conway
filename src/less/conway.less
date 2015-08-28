@@ -1,7 +1,58 @@
 @import (inline) '../../node_modules/normalize.css/normalize.css';
 
+@font-size: 16px;
+@controls-expanded-width: 166px;
+
 html, body {
   height: 100%;
   overflow: hidden;
   width: 100%;
+}
+
+body {
+  font-size: @font-size;
+}
+
+.grid {
+  position: absolute;
+  z-index: 1;
+}
+
+.controls {
+  background-color: rgba(0, 0, 0, 0.75);
+  height: @font-size * 2;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: @font-size * 4;
+  z-index: 2;
+
+  &.expanded {
+    height: 100%;
+    width: @controls-expanded-width;
+  }
+}
+
+.btn {
+  color: white;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+
+  .glyphicon {
+    line-height: 2;
+  }
+
+  &.toggler, &.play {
+    height: @font-size * 2;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: @font-size * 2;
+  }
+
+  &.play {
+    left: @font-size * 2;
+  }
 }
