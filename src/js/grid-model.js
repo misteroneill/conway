@@ -84,7 +84,7 @@ export default class GridModel {
    */
   randomize (weight) {
     if (!_.isNumber(weight) || weight < 0 || weight > 1) {
-      weight = 0.5;
+      weight = 0.25;
     }
     if (weight === 0) {
       this.genocide();

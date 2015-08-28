@@ -81,6 +81,25 @@ class Conway {
   }
 
   /**
+   * Increases the speed of generation by a given number of milliseconds.
+   *
+   * @param {Number} [ms]
+   */
+  speedUp (ms) {
+    let speed = store.get(this).tick.speed;
+    store.get(this).tick.speed -= speed < ms ? speed : ms;
+  }
+
+  /**
+   * Decreases the speed of generation by a given number of milliseconds.
+   *
+   * @param {Number} [ms]
+   */
+  slowDown (ms) {
+    store.get(this).tick.speed += ms;
+  }
+
+  /**
    * Retrieve a count of generations passed so far.
    *
    * @return {Number}

@@ -16,7 +16,7 @@ const COLOR_CELL_ALIVE = 'rgba(255, 255, 255, 1)';
  */
 function resize() {
   const dimensions = this.getDimensions();
-  dom.setAttrs(this.el, dimensions);
+  dom.attrs(this.el, dimensions);
   this.model.resize(
     Math.floor((dimensions.height - CELL_GAP) / CELL_OFFSET),
     Math.floor((dimensions.width - CELL_GAP) / CELL_OFFSET)
