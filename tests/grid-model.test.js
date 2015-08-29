@@ -44,6 +44,25 @@ describe('GridModel', () => {
     });
   });
 
+  describe('#genocide', () => {
+
+    it('should kill all living cells', () => {
+      model.genocide();
+      assert(_.flatten(model.data()).every(cell => !cell));
+    });
+  });
+
+  describe('#randomize', () => {
+
+    it('should randomly populate the model', () => {
+      model.randomize();
+      let cells = _.flatten(model.data());
+      assert.notStrictEqual(cells.join('-'), _.flatten(data).join('-'));
+      assert(cells.some(cell => !!cell));
+      assert(cells.some(cell => !cell));
+    });
+  });
+
   describe('#data()', () => {
 
     it('should be an array', () => {
@@ -103,6 +122,49 @@ describe('GridModel', () => {
       assert.strictEqual(model.flipCell(0, 1), 0);
       assert.strictEqual(model.flipCell(3, 3), 1);
       assert.strictEqual(model.flipCell(5, 5), null);
+    });
+  });
+
+  describe('#tick()', () => {
+
+    it('rule #1: should kill live cells with fewer than two living neighbors', () => {
+      model.populate([
+        [0, 0, 0],
+        [0, 1, 0],
+        [0, 0, 0],
+      ]);
+      model.tick();
+      assert.strictEqual(model.data()[1][1], 0);
+    });
+
+    it('rule #2: should leave alive any living cells with two or three neighbors', () => {
+      model.populate([
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0],
+      ]);
+      model.tick();
+      assert.strictEqual(model.data()[1][1], 1);
+    });
+
+    it('rule #3: should kill live cells with more than three living neighbors', () => {
+      model.populate([
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 1, 0],
+      ]);
+      model.tick();
+      assert.strictEqual(model.data()[1][1], 0);
+    });
+
+    it('rule #4: should bring to life dead cells with exactly three living neighbors', () => {
+      model.populate([
+        [0, 1, 0],
+        [1, 0, 1],
+        [0, 0, 0],
+      ]);
+      model.tick();
+      assert.strictEqual(model.data()[1][1], 1);
     });
   });
 });
