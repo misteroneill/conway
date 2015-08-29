@@ -6,8 +6,8 @@ const CELL_GAP = 3;
 const CELL_SIZE = 12;
 const CELL_OFFSET = CELL_GAP + CELL_SIZE;
 
-const COLOR_CELL_DEAD = 'rgba(255, 255, 255, 0.5)';
-const COLOR_CELL_ALIVE = 'rgba(255, 255, 255, 1)';
+const COLOR_DEAD = 'rgba(255, 255, 255, 0.5)';
+const COLOR_ALIVE = 'rgba(255, 255, 255, 1)';
 
 /**
  * Base function used to generate throttled resize handlers.
@@ -63,25 +63,25 @@ export default class View {
    */
   draw () {
     const dimensions = this.getDimensions();
+    const data = this.model.data();
+    let y = CELL_GAP;
 
     this.context.clearRect(0, 0, dimensions.width, dimensions.height);
 
-    let y = CELL_GAP;
-
-    this.model.data().forEach(function (row) {
+    for (let i = 0; i < data.length; i++) {
       let x = CELL_GAP;
 
-      row.forEach(function (cell) {
-        let type = cell ? 'fill' : 'stroke';
+      for (let j = 0; j < data[i].length; j++) {
+        let type = data[i][j] ? 'fill' : 'stroke';
 
-        this.context[type + 'Style'] = cell ? COLOR_CELL_ALIVE : COLOR_CELL_DEAD;
+        this.context[type + 'Style'] = data[i][j] ? COLOR_ALIVE : COLOR_DEAD;
         this.context[type + 'Rect'](x, y, CELL_SIZE, CELL_SIZE);
 
         x += CELL_OFFSET;
-      }, this);
+      }
 
       y += CELL_OFFSET;
-    }, this);
+    }
   }
 
   /**
