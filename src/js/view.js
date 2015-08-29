@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import dom from './dom';
-import GridModel from './grid-model';
+import Model from './model';
 
 const CELL_GAP = 3;
 const CELL_SIZE = 12;
@@ -24,7 +24,7 @@ function resize() {
   this.draw();
 }
 
-export default class GridView {
+export default class View {
 
   /**
    * Canvas view constructor.
@@ -32,7 +32,7 @@ export default class GridView {
    * @constructor
    */
   constructor () {
-    this.model = new GridModel();
+    this.model = new Model();
     this.el = dom.el('canvas', {'class': 'grid'});
     this.el.addEventListener('click', this.handleClick.bind(this));
     this.context = this.el.getContext('2d');

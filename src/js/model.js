@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-// Private data store for raw grid data.
+// Private data store for raw data.
 const store = new WeakMap();
 
 /**
@@ -8,12 +8,12 @@ const store = new WeakMap();
  *
  * By default, it is populated with a 1x1 grid containing a single zero.
  *
- * @class GridModel
+ * @class Model
  */
-export default class GridModel {
+export default class Model {
 
   /**
-   * GridModel constructor.
+   * Model constructor.
    *
    * @constructor
    * @param       {Array} data Provide initial data for the model.

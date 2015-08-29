@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import assert from 'assert';
-import GridModel from '../src/js/grid-model';
+import Model from '../src/js/model';
 
 const data = [
   [0, 1, 0, 1],
@@ -11,10 +11,10 @@ const data = [
 
 let model;
 
-describe('GridModel', () => {
+describe('Model', () => {
 
   beforeEach(() => {
-    model = new GridModel(data);
+    model = new Model(data);
   });
 
   describe('#populate()', () => {

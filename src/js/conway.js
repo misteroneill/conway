@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Controls from './controls';
-import GridView from './grid-view';
+import View from './view';
 
 const DEFAULT_SPEED = 250;
 
@@ -16,11 +16,11 @@ class Conway {
    */
   constructor () {
     let controls = new Controls(this);
-    let grid = new GridView();
+    let view = new View();
 
     store.set(this, {
       controls: controls,
-      grid: grid,
+      view: view,
       playing: false,
       tick: {
         count: 0,
@@ -31,7 +31,7 @@ class Conway {
 
     this.tick = this.tick.bind(this);
 
-    window.addEventListener('resize', grid.resize);
+    window.addEventListener('resize', view.resize);
   }
 
   /**
@@ -50,9 +50,9 @@ class Conway {
    * @method genocide
    */
   genocide (...args) {
-    let grid = store.get(this).grid;
-    grid.model.genocide(...args);
-    grid.draw();
+    let view = store.get(this).view;
+    view.model.genocide(...args);
+    view.draw();
   }
 
   /**
@@ -63,9 +63,9 @@ class Conway {
    *         A number from zero to one, representing the ratio of living cells.
    */
   randomize (...args) {
-    let grid = store.get(this).grid;
-    grid.model.randomize(...args);
-    grid.draw();
+    let view = store.get(this).view;
+    view.model.randomize(...args);
+    view.draw();
   }
 
   /**
@@ -119,8 +119,8 @@ class Conway {
     let data = store.get(this);
     if (data.playing && timestamp - data.tick.timestamp >= data.tick.speed) {
       data.tick.count++;
-      data.grid.model.tick();
-      data.grid.draw();
+      data.view.model.tick();
+      data.view.draw();
       data.tick.timestamp = timestamp;
     }
     window.requestAnimationFrame(this.tick);
