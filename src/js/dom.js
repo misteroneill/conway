@@ -55,13 +55,19 @@ export default {
     if (_.isObject(attrs)) {
       Object.keys(attrs).forEach(key => {
         let value = attrs[key];
+
         if (key === 'class' || key === 'className') {
           key = 'class';
           if (Array.isArray(value)) {
             value = value.filter(_.identity).join(' ');
           }
         }
-        el.setAttribute(key, value);
+
+        if (value === null || _.isUndefined(value)) {
+          el.removeAttribute(key);
+        } else {
+          el.setAttribute(key, value);
+        }
       });
     }
     return el;

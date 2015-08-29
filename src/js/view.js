@@ -65,8 +65,10 @@ export default class View {
   draw () {
     const dimensions = this.getDimensions();
 
-    this.context.fillStyle = COLOR_GRID;
-    this.context.fillRect(0, 0, dimensions.width, dimensions.height);
+    this.context.clearRect(0, 0, dimensions.width, dimensions.height);
+
+    // this.context.fillStyle = COLOR_GRID;
+    // this.context.fillRect(0, 0, dimensions.width, dimensions.height);
 
     let y = CELL_GAP;
 

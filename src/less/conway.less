@@ -1,9 +1,17 @@
 @import (inline) '../../node_modules/normalize.css/normalize.css';
 
-@font-size: 16px;
+@color-bg: rgba(0, 0, 0, 1);
+@color-border: rgba(255, 255, 255, .25);
+@color-text: rgba(255, 255, 255, 1);
+@color-head: rgba(255, 255, 255, .8);
+
+@font-size: 14px;
 @controls-expanded-width: 166px;
 
 html, body {
+  background: @color-bg;
+  color: @color-text;
+  font: @font-size/1 'Helvetica Neue', Helvetica, Arial, sans-serif;
   height: 100%;
   overflow: hidden;
   width: 100%;
@@ -13,17 +21,21 @@ body {
   font-size: @font-size;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  color: @color-head;
+}
+
 .grid {
   position: absolute;
   z-index: 1;
 }
 
 .controls {
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, .75);
   height: 0;
   left: 0;
   overflow: hidden;
-  padding-top: @font-size * 2;
+  padding: @font-size * 2 @font-size / 2 0;
   position: absolute;
   top: 0;
   width: @font-size * 4;
@@ -31,29 +43,66 @@ body {
 
   &.expanded {
     height: 100%;
+    padding-bottom: @font-size * 2;
     width: @controls-expanded-width;
+  }
+
+  .section {
+
+    h1 {
+      font-size: @font-size * .75;
+      font-weight: normal;
+      text-transform: uppercase;
+    }
   }
 }
 
 .btn {
-  color: white;
+  border: 1px solid @color-border;
+  border-radius: @font-size / 2;
   cursor: pointer;
   display: block;
   text-align: center;
 
   .glyphicon {
     line-height: 2;
+    top: 0;
+  }
+
+  &.btn-icon {
+    height: @font-size * 2;
+    width: @font-size * 2;
+  }
+
+  &.btn-icon-and-text {
+    @vertical-spacing: 10px;
+
+    margin: 0 0 @font-size;
+    padding: @vertical-spacing @font-size @vertical-spacing @font-size * 2;
+    position: relative;
+    text-align: left;
+
+    .glyphicon {
+      left: @font-size / 2;
+      line-height: 1;
+      position: absolute;
+      top: @vertical-spacing;
+    }
   }
 
   &.toggler, &.play {
-    height: @font-size * 2;
+    border: none;
     left: 0;
     position: absolute;
     top: 0;
-    width: @font-size * 2;
   }
 
   &.play {
     left: @font-size * 2;
+  }
+
+  .section.speed & {
+    float: left;
+    margin-right: @font-size / 2;
   }
 }

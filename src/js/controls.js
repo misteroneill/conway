@@ -28,20 +28,43 @@ export default class Controls {
 
     this.el = dom.appendChildren(
       dom.el('div', {className: 'controls'}),
-      this.createButton('toggler', {icon: 'cog'}),
-      this.createButton('play', {icon: 'play'}),
+      this.createButton('toggler', {
+        icon: 'cog',
+        title: 'Settings'
+      }),
+      this.createButton('play', {
+        icon: 'play',
+        title: 'Play/Pause'
+      }),
       dom.appendChildren(
         dom.el('div', {className: ['section', 'population']}),
         dom.el('h1', 'Population'),
-        this.createButton('randomize', {icon: 'random', text: 'Randomize'}),
-        this.createButton('genocide', {icon: 'fire', text: 'Genocide'})
+        this.createButton('randomize', {
+          icon: 'random',
+          text: 'Randomize',
+          title: 'Populate the grid with a random assortment of living cells'
+        }),
+        this.createButton('genocide', {
+          icon: 'fire',
+          text: 'Genocide',
+          title: 'Kill all living cells; reset the grid'
+        })
       ),
       dom.appendChildren(
         dom.el('div', {className: ['section', 'speed']}),
         dom.el('h1', 'Speed'),
-        this.createButton('speed-up', {icon: 'upload'}),
-        this.createButton('speed-reset', {icon: 'refresh'}),
-        this.createButton('slow-down', {icon: 'download'})
+        this.createButton('speed-up', {
+          icon: 'upload',
+          title: 'Increase speed'
+        }),
+        this.createButton('speed-reset', {
+          icon: 'refresh',
+          title: 'Reset speed to default'
+        }),
+        this.createButton('slow-down', {
+          icon: 'download',
+          title: 'Reduce speed'
+        })
       )
     );
 
@@ -59,9 +82,11 @@ export default class Controls {
       className: [
         'btn',
         name,
-        options.icon ? 'btn-icon' : '',
-        options.text ? 'btn-text' : '',
-      ]
+        options.icon && !options.text ? 'btn-icon' : '',
+        options.text && !options.icon ? 'btn-text' : '',
+        options.icon && options.text ? 'btn-icon-and-text' : '',
+      ],
+      title: options.title
     });
 
     if (options.icon) {
