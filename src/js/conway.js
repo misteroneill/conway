@@ -119,6 +119,7 @@ class Conway {
     let data = store.get(this);
     if (data.playing && timestamp - data.tick.timestamp >= data.tick.speed) {
       data.tick.count++;
+      data.controls.updateGeneration();
       data.view.model.tick();
       data.view.draw();
       data.tick.timestamp = timestamp;

@@ -41,13 +41,21 @@ export default class Controls {
         dom.el('h1', 'What is this?'),
         dom.appendChildren(
           dom.el('p'),
-          dom.el('a', 'Conway\'s Game of Life', {href: 'https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'}),
-          document.createTextNode([
-            ' is a cellular automation simulator. It is not a true "game"; ',
-            'rather, the player sets up conditions for simulated life to ',
-            'evolve and interesting patterns to be created.'
-          ].join(''))
-        )
+          dom.el('a', 'Conway\'s Game of Life', {
+            href: 'https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'
+          }),
+          document.createTextNode(
+            ` is a cellular automation simulator. It is not a true "game";
+            rather, the player sets up conditions for simulated life to
+            evolve. Many interesting patterns can be revealed.`
+          )
+        ),
+        dom.el('p', 'Click the squares to toggle their state!')
+      ),
+      dom.appendChildren(
+        dom.el('div', {className: ['section', 'generations']}),
+        dom.el('h1', 'Generations'),
+        dom.el('span', '0', {className: 'generation-count'})
       ),
       dom.appendChildren(
         dom.el('div', {className: ['section', 'population']}),
@@ -116,6 +124,12 @@ export default class Controls {
     }
 
     return btn;
+  }
+
+  updateGeneration () {
+    let el = this.el.querySelector('.generation-count');
+    el.removeChild(el.firstChild);
+    el.appendChild(document.createTextNode(String(this.game.generations())));
   }
 
   handleClick (e) {
