@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import dom from './lib/dom';
+import dom from './dom';
 import GridModel from './grid-model';
 
 const CELL_GAP = 3;

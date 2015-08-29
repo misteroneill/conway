@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import dom from './lib/dom';
+import dom from './dom';
 
 const delegations = new Map([
   ['.btn.toggler',     'handleToggler'],
