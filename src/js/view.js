@@ -6,7 +6,6 @@ const CELL_GAP = 3;
 const CELL_SIZE = 12;
 const CELL_OFFSET = CELL_GAP + CELL_SIZE;
 
-const COLOR_GRID = 'rgba(0, 0, 0, 1)';
 const COLOR_CELL_DEAD = 'rgba(255, 255, 255, 0.5)';
 const COLOR_CELL_ALIVE = 'rgba(255, 255, 255, 1)';
 
@@ -66,9 +65,6 @@ export default class View {
     const dimensions = this.getDimensions();
 
     this.context.clearRect(0, 0, dimensions.width, dimensions.height);
-
-    // this.context.fillStyle = COLOR_GRID;
-    // this.context.fillRect(0, 0, dimensions.width, dimensions.height);
 
     let y = CELL_GAP;
 

@@ -2,6 +2,7 @@
 
 @color-bg: rgba(0, 0, 0, 1);
 @color-border: rgba(255, 255, 255, .25);
+@color-link: rgba(120, 160, 240, 1);
 @color-text: rgba(255, 255, 255, 1);
 @color-head: rgba(255, 255, 255, .8);
 
@@ -19,6 +20,16 @@ html, body {
 
 body {
   font-size: @font-size;
+}
+
+a {
+  color: @color-link;
+  text-decoration: underline;
+
+  &:hover, &:active, &:focus {
+    color: @color-link;
+    text-decoration: none;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -46,13 +57,23 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: @font-size * 2;
     width: @controls-expanded-width;
   }
+}
 
-  .section {
+.section {
 
-    h1 {
-      font-size: @font-size * .75;
-      font-weight: normal;
-      text-transform: uppercase;
+  h1 {
+    font-size: @font-size * .8333;
+    font-weight: normal;
+    text-transform: uppercase;
+  }
+
+  &.explanation {
+    color: @color-head;
+    font-size: @font-size * .8333;
+
+    p {
+      line-height: 1.333;
+      margin: 0 0 @font-size;
     }
   }
 }

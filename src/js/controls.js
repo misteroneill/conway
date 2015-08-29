@@ -37,6 +37,19 @@ export default class Controls {
         title: 'Play/Pause'
       }),
       dom.appendChildren(
+        dom.el('div', {className: ['section', 'explanation']}),
+        dom.el('h1', 'What is this?'),
+        dom.appendChildren(
+          dom.el('p'),
+          dom.el('a', 'Conway\'s Game of Life', {href: 'https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'}),
+          document.createTextNode([
+            ' is a cellular automation simulator. It is not a true "game"; ',
+            'rather, the player sets up conditions for simulated life to ',
+            'evolve and interesting patterns to be created.'
+          ].join(''))
+        )
+      ),
+      dom.appendChildren(
         dom.el('div', {className: ['section', 'population']}),
         dom.el('h1', 'Population'),
         this.createButton('randomize', {
