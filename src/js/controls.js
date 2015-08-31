@@ -1,15 +1,5 @@
 import _ from 'lodash';
-import dom from './dom';
-
-const delegations = new Map([
-  ['.btn.toggler',     'handleToggler'],
-  ['.btn.play',        'handlePlay'],
-  ['.btn.randomize',   'handleRandomize'],
-  ['.btn.genocide',    'handleGenocide'],
-  ['.btn.speed-up',    'handleSpeedUp'],
-  ['.btn.slow-down',   'handleSlowDown'],
-  ['.btn.speed-reset', 'handleSpeedReset'],
-]);
+import $ from 'jquery';
 
 /**
  * A UI element that allows the user to control the evolution.
@@ -22,137 +12,130 @@ export default class Controls {
    * Controls constructor.
    *
    * @constructor
+   * @param {Conway} game
    */
   constructor (game) {
     this.game = game;
 
-    this.el = dom.appendChildren(
-      dom.el('div', {className: 'controls'}),
-      this.createButton('toggler', {
+    this.el = $('<div>', {'class': 'controls'}).
+      append(this.createButton('toggler', {
         icon: 'cog',
         title: 'Settings'
-      }),
-      this.createButton('play', {
+      })).
+      append(this.createButton('play', {
         icon: 'play',
         title: 'Play/Pause'
-      }),
-      dom.appendChildren(
-        dom.el('div', {className: ['section', 'explanation']}),
-        dom.el('h1', 'What is this?'),
-        dom.appendChildren(
-          dom.el('p'),
-          dom.el('a', 'Conway\'s Game of Life', {
-            href: 'https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'
-          }),
-          document.createTextNode(
-            ` is a cellular automation simulator. It is not a true "game";
-            rather, the player sets up conditions for simulated life to
-            evolve. Many interesting patterns can be revealed.`
-          )
-        ),
-        dom.el('p', 'Click the squares to toggle their state!')
-      ),
-      dom.appendChildren(
-        dom.el('div', {className: ['section', 'generations']}),
-        dom.el('h1', 'Generations'),
-        dom.el('span', '0', {className: 'generation-count'})
-      ),
-      dom.appendChildren(
-        dom.el('div', {className: ['section', 'population']}),
-        dom.el('h1', 'Population'),
-        this.createButton('randomize', {
-          icon: 'random',
-          text: 'Randomize',
-          title: 'Populate the grid with a random assortment of living cells'
-        }),
-        this.createButton('genocide', {
-          icon: 'fire',
-          text: 'Genocide',
-          title: 'Kill all living cells; reset the grid'
-        })
-      ),
-      dom.appendChildren(
-        dom.el('div', {className: ['section', 'speed']}),
-        dom.el('h1', 'Speed'),
-        this.createButton('speed-up', {
-          icon: 'upload',
-          title: 'Increase speed'
-        }),
-        this.createButton('speed-reset', {
-          icon: 'refresh',
-          title: 'Reset speed to default'
-        }),
-        this.createButton('slow-down', {
-          icon: 'download',
-          title: 'Reduce speed'
-        })
-      )
-    );
-
-    this.el.addEventListener('click', this.handleClick.bind(this));
-
-    document.body.appendChild(this.el);
+      })).
+      append(`
+        <div class="section explanation">
+          <h1>What is this?</h1>
+          <p>
+            <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">
+            Conway's Game of Life</a> is a cellular automaton. It is not a
+            "game" in the usual sense; rather, the player sets up initial
+            conditions for simulated life to evolve and lets the automaton take
+            over.
+          </p>
+          <p>
+            Click the squares to toggle their state - or choose predefined
+            states using the controls below.
+          </p>
+        </div>
+        <div class="section generations">
+          <h1>Generations</h1>
+          <span class="generation-count">0</span>
+        </div>
+        <div class="section population">
+          <h1>Population</h1>
+        </div>
+        <div class="section speed">
+          <h1>Speed</h1>
+        </div>
+      `).
+      find('.population').
+      append(this.createButton('randomize', {
+        icon: 'random',
+        text: 'Randomize',
+        title: 'Populate the grid with a random assortment of living cells'
+      })).
+      append(this.createButton('genocide', {
+        icon: 'fire',
+        text: 'Genocide',
+        title: 'Kill all living cells; reset the grid'
+      })).
+      end().
+      find('.speed').
+      append(this.createButton('speed-up', {
+        icon: 'upload',
+        title: 'Increase speed'
+      })).
+      append(this.createButton('speed-reset', {
+        icon: 'refresh',
+        title: 'Reset speed to default'
+      })).
+      append(this.createButton('slow-down', {
+        icon: 'download',
+        title: 'Reduce speed'
+      })).
+      end().
+      on('click', '.btn.toggler', this.handleToggler.bind(this)).
+      on('click', '.btn.play', this.handlePlay.bind(this)).
+      on('click', '.btn.randomize', this.handleRandomize.bind(this)).
+      on('click', '.btn.genocide', this.handleGenocide.bind(this)).
+      on('click', '.btn.speed-up', this.handleSpeedUp.bind(this)).
+      on('click', '.btn.slow-down', this.handleSlowDown.bind(this)).
+      on('click', '.btn.speed-reset', this.handleSpeedReset.bind(this)).
+      appendTo(document.body);
   }
 
+  /**
+   * Creates a button element with some common conventions.
+   *
+   * @param  {String} name
+   * @param  {Object} options
+   * @return {jQuery}
+   */
   createButton (name, options) {
-    let classes = ['btn', name];
-
     this.btns = this.btns || {};
 
-    let btn = this.btns[name] = dom.el('span', {
-      className: [
+    this.btns[name] = $('<span>', {
+      'class': [
         'btn',
         name,
         options.icon && !options.text ? 'btn-icon' : '',
         options.text && !options.icon ? 'btn-text' : '',
         options.icon && options.text ? 'btn-icon-and-text' : '',
-      ],
-      title: options.title
+      ].filter(_.identity).join(' '),
+      title: options.title || ''
     });
 
     if (options.icon) {
-      let icon = dom.el('span', {
-        className: ['glyphicon', `glyphicon-${options.icon}`]
-      });
-      btn.appendChild(icon);
+      this.btns[name].append($('<span>', {
+        'class': ['glyphicon', `glyphicon-${options.icon}`].join(' ')
+      }));
     }
 
     if (options.text) {
-      let text = dom.el('span', {className: 'text'});
-      text.appendChild(document.createTextNode(options.text));
-      btn.appendChild(text);
+      this.btns[name].append($('<span>', {'class': 'text'}).text(options.text));
     }
 
-    return btn;
+    return this.btns[name];
   }
 
   updateGeneration () {
-    let el = this.el.querySelector('.generation-count');
-    el.removeChild(el.firstChild);
-    el.appendChild(document.createTextNode(String(this.game.generations())));
-  }
-
-  handleClick (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    delegations.forEach((method, selector) => {
-      let target = this.el.querySelector(selector);
-      if (e.target === target || target.contains(e.target)) {
-        this[method]();
-      }
-    }, this);
+    this.el.find('.generation-count').text(this.game.generations());
   }
 
   handleToggler () {
-    this.el.classList.toggle('expanded');
-    this.btns.toggler.firstChild.classList.toggle('glyphicon-cog');
-    this.btns.toggler.firstChild.classList.toggle('glyphicon-remove');
+    this.el.toggleClass('expanded');
+    this.btns.toggler.find('.glyphicon').toggleClass('glyphicon-cog');
+    this.btns.toggler.find('.glyphicon').toggleClass('glyphicon-remove');
   }
 
   handlePlay () {
     this.game.playing();
-    this.btns.play.firstChild.classList.toggle('glyphicon-play');
-    this.btns.play.firstChild.classList.toggle('glyphicon-pause');
+    this.btns.play.find('.glyphicon').toggleClass('glyphicon-play');
+    this.btns.play.find('.glyphicon').toggleClass('glyphicon-pause');
   }
 
   handleRandomize () {

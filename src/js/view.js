@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import dom from './dom';
+import $ from 'jquery';
 import Model from './model';
 
 const CELL_GAP = 3;
@@ -15,7 +15,7 @@ const COLOR_ALIVE = 'rgba(255, 255, 255, 1)';
  */
 function resize() {
   const dimensions = this.getDimensions();
-  dom.attrs(this.el, dimensions);
+  this.el.attr(dimensions);
   this.model.resize(
     Math.floor((dimensions.height - CELL_GAP) / CELL_OFFSET),
     Math.floor((dimensions.width - CELL_GAP) / CELL_OFFSET)
@@ -32,12 +32,12 @@ export default class View {
    */
   constructor () {
     this.model = new Model();
-    this.el = dom.el('canvas', {'class': 'grid'});
-    this.el.addEventListener('click', this.handleClick.bind(this));
-    this.context = this.el.getContext('2d');
+    this.el = $('<canvas>', {'class': 'grid'}).
+      on('click', this.handleClick.bind(this)).
+      appendTo(document.body);
+    this.context = this.el.get(0).getContext('2d');
     this.resize = _.throttle(resize, 500).bind(this);
     this.resize();
-    document.body.appendChild(this.el);
   }
 
   /**

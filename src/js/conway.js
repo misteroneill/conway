@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import $ from 'jquery';
 import Controls from './controls';
 import View from './view';
 
@@ -31,7 +32,7 @@ class Conway {
 
     this.tick = this.tick.bind(this);
 
-    window.addEventListener('resize', view.resize);
+    $(window).on('resize', view.resize);
   }
 
   /**
