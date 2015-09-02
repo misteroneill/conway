@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Base from './base';
 
 // Private data store for raw data.
 const store = new WeakMap();
@@ -10,7 +11,7 @@ const store = new WeakMap();
  *
  * @class Model
  */
-export default class Model {
+export default class Model extends Base {
 
   /**
    * Model constructor.
@@ -19,6 +20,7 @@ export default class Model {
    * @param       {Array} data Provide initial data for the model.
    */
   constructor (data) {
+    super(data);
     this.populate(Array.isArray(data) ? _.cloneDeep(data) : [[0]]);
   }
 
@@ -42,6 +44,7 @@ export default class Model {
    * @method destroy
    */
   destroy () {
+    this.emit('destroy');
     store.delete(this);
   }
 
@@ -58,6 +61,7 @@ export default class Model {
     if (!Array.isArray(data[0]) || !_.isNumber(data[0][0])) {
       throw new Error('data[0] must be an array with at least one number');
     }
+    this.emit('populate', data);
     store.set(this, data);
   }
 
@@ -73,6 +77,7 @@ export default class Model {
         data[i][j] = 0;
       }
     }
+    this.emit('genocide');
   }
 
   /**
@@ -96,6 +101,7 @@ export default class Model {
         }
       }
     }
+    this.emit('randomize', weight);
   }
 
   /**
@@ -119,15 +125,18 @@ export default class Model {
    * @param  {Number} col
    * @param  {Number|Boolean} value
    *         Treated as truthy/falsy, set as one/zero respectively.
+   * @param  {Boolean} [silent] Whether or not to broadcast set-cell event.
    * @return {Number|null}
    */
-  setCell (row, col, value) {
+  setCell (row, col, value, silent) {
     let current = this.getCell(row, col);
-    if (current === null) {
-      return current;
+    let updated = current === null ? null : Number(!!value);
+    if (_.isNumber(updated)) {
+      store.get(this)[row][col] = updated;
     }
-    let updated = value ? 1 : 0;
-    store.get(this)[row][col] = updated;
+    if (!silent) {
+      this.emit('set-cell', current, updated);
+    }
     return updated;
   }
 
@@ -135,16 +144,17 @@ export default class Model {
    * Flip the value of a single cell between zero or one. The value is only
    * set if the cell exists.
    *
-   * @param {Number} row
-   * @param {Number} col
+   * @param  {Number} row
+   * @param  {Number} col
+   * @param  {Boolean} [silent]
    * @return {Number|null}
    */
-  flipCell (row, col) {
+  flipCell (row, col, silent) {
     let value = this.getCell(row, col);
     if (value === null) {
       return value;
     }
-    return this.setCell(row, col, !value);
+    return this.setCell(row, col, !value, silent);
   }
 
   /**
@@ -152,40 +162,49 @@ export default class Model {
    * zeros.
    *
    * @method resize
-   * @param  {Number} rowCountNew
-   * @param  {Number} colCountNew
+   * @param  {Number} rowsCurr
+   * @param  {Number} colsCurr
    */
-  resize (rowCountNew, colCountNew) {
+  resize (rowsCurr, colsCurr) {
     let data = store.get(this);
-    let rowCountOld = data.length;
-    let rowDiff = rowCountNew - rowCountOld;
-    let colCountOld = data[0].length;
-    let colDiff = colCountNew - colCountOld;
+    let rowsPrev = data.length;
+    let rowsDiff = rowsCurr - rowsPrev;
+    let colsPrev = data[0].length;
+    let colsDiff = colsCurr - colsPrev;
 
     // Adding new row(s) of dead cells.
-    if (rowDiff > 0) {
-      for (let i = rowCountOld; i < rowCountNew; i++) {
-        data[i] = _.fill(Array(colCountNew), 0);
+    if (rowsDiff > 0) {
+      for (let i = rowsPrev; i < rowsCurr; i++) {
+        data[i] = _.fill(Array(colsCurr), 0);
       }
 
     // Removing old row(s).
-    } else if (rowDiff < 0) {
-      data.length += rowDiff;
+    } else if (rowsDiff < 0) {
+      data.length += rowsDiff;
     }
 
     // Adding or removing dead cells from existing row(s).
-    if (colDiff !== 0) {
+    if (colsDiff !== 0) {
 
       // The `Math.min` call here ensures that we don't iterate too far if
       // the number of rows was reduced.
-      for (let i = 0; i < Math.min(rowCountOld, data.length); i++) {
-        if (colDiff > 0) {
-          data[i] = data[i].concat(_.fill(Array(colDiff), 0));
+      for (let i = 0; i < Math.min(rowsPrev, data.length); i++) {
+        if (colsDiff > 0) {
+          data[i] = data[i].concat(_.fill(Array(colsDiff), 0));
         } else {
-          data[i].length += colDiff;
+          data[i].length += colsDiff;
         }
       }
     }
+
+    this.emit('resize', {
+      rowsCurr: rowsCurr,
+      rowsPrev: rowsPrev,
+      rowsDiff: rowsDiff,
+      colsCurr: colsCurr,
+      colsPrev: colsPrev,
+      colsDiff: colsDiff,
+    });
   }
 
   /**
@@ -230,14 +249,16 @@ export default class Model {
         // caused by under-population. Any live cell with more than three
         // live neighbours dies, as if by overcrowding.
         if (thisCell && (livingNeighbors < 2 || livingNeighbors > 3)) {
-          this.setCell(i, j, 0);
+          this.setCell(i, j, 0, true);
 
         // Any dead cell with exactly three live neighbours becomes a live
         // cell, as if by reproduction.
         } else if (!thisCell && livingNeighbors === 3) {
-          this.setCell(i, j, 1);
+          this.setCell(i, j, 1, true);
         }
       }
     }
+
+    this.emit('tick');
   }
 }

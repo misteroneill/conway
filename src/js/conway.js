@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import Base from './base';
 import Controls from './controls';
 import View from './view';
 
@@ -8,19 +9,22 @@ const DEFAULT_SPEED = 250;
 // Private data store for Conway instances.
 const store = new WeakMap();
 
-class Conway {
+class Conway extends Base {
 
   /**
    * Conway constructor.
    *
    * @constructor
    */
-  constructor () {
-    let controls = new Controls(this);
+  constructor (...args) {
+    super(args);
+
+    let controls = new Controls();
     let view = new View();
 
     store.set(this, {
       controls: controls,
+      model: view.model,
       view: view,
       playing: false,
       tick: {
@@ -30,19 +34,43 @@ class Conway {
       }
     });
 
-    this.tick = this.tick.bind(this);
+    this.bindMethods([
+      'genocide', 'pause', 'play', 'randomize',
+      'speed', 'speedDown', 'speedUp', 'tick',
+    ]);
+
+    this.on('tick', controls.updateGenerationCount);
+
+    controls.
+      on('genocide', this.genocide).
+      on('pause', this.pause).
+      on('pause', view.pause).
+      on('play', this.play).
+      on('play', view.play).
+      on('randomize', this.randomize).
+      on('speed-down', this.speedDown).
+      on('speed-reset', this.speed).
+      on('speed-up', this.speedUp);
 
     $(window).on('resize', view.resize);
   }
 
   /**
-   * Toggles whether or not the game is playing.
+   * Stops the tick.
    *
-   * @method  togglePlaying
+   * @method pause
    */
-  playing () {
-    let data = store.get(this);
-    data.playing = !data.playing;
+  pause () {
+    store.get(this).playing = false;
+  }
+
+  /**
+   * Starts the tick.
+   *
+   * @method play
+   */
+  play () {
+    store.get(this).playing = true;
   }
 
   /**
@@ -51,9 +79,7 @@ class Conway {
    * @method genocide
    */
   genocide (...args) {
-    let view = store.get(this).view;
-    view.model.genocide(...args);
-    view.draw();
+    store.get(this).model.genocide(...args);
   }
 
   /**
@@ -64,9 +90,7 @@ class Conway {
    *         A number from zero to one, representing the ratio of living cells.
    */
   randomize (...args) {
-    let view = store.get(this).view;
-    view.model.randomize(...args);
-    view.draw();
+    store.get(this).model.randomize(...args);
   }
 
   /**
@@ -87,8 +111,8 @@ class Conway {
    * @param {Number} [ms]
    */
   speedUp (ms) {
-    let speed = store.get(this).tick.speed;
-    store.get(this).tick.speed -= speed < ms ? speed : ms;
+    let tick = store.get(this).tick;
+    tick.speed -= tick.speed < ms ? tick.speed : ms;
   }
 
   /**
@@ -96,17 +120,8 @@ class Conway {
    *
    * @param {Number} [ms]
    */
-  slowDown (ms) {
+  speedDown (ms) {
     store.get(this).tick.speed += ms;
-  }
-
-  /**
-   * Retrieve a count of generations passed so far.
-   *
-   * @return {Number}
-   */
-  generations () {
-    return store.get(this).tick.count;
   }
 
   /**
@@ -120,10 +135,9 @@ class Conway {
     let data = store.get(this);
     if (data.playing && timestamp - data.tick.timestamp >= data.tick.speed) {
       data.tick.count++;
-      data.controls.updateGeneration();
-      data.view.model.tick();
-      data.view.draw();
+      data.model.tick();
       data.tick.timestamp = timestamp;
+      this.emit('tick', data.tick.count);
     }
     window.requestAnimationFrame(this.tick);
   }

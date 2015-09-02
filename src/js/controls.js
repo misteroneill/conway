@@ -1,21 +1,29 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import Base from './base';
+
+const SPEED_INCREMENT = 75;
 
 /**
  * A UI element that allows the user to control the evolution.
  *
  * @class Controls
  */
-export default class Controls {
+export default class Controls extends Base {
 
   /**
    * Controls constructor.
    *
    * @constructor
-   * @param {Conway} game
    */
-  constructor (game) {
-    this.game = game;
+  constructor (...args) {
+    super(args);
+
+    this.bindMethods([
+      'handleGenocide', 'handlePlayPause', 'handleRandomize',
+      'handleSpeedDown', 'handleSpeedReset', 'handleSpeedUp',
+      'handleToggler', 'updateGenerationCount',
+    ]);
 
     this.el = $('<div>', {'class': 'controls'}).
       append(this.createButton('toggler', {
@@ -73,18 +81,18 @@ export default class Controls {
         icon: 'refresh',
         title: 'Reset speed to default'
       })).
-      append(this.createButton('slow-down', {
+      append(this.createButton('speed-down', {
         icon: 'download',
         title: 'Reduce speed'
       })).
       end().
-      on('click', '.btn.toggler', this.handleToggler.bind(this)).
-      on('click', '.btn.play', this.handlePlay.bind(this)).
-      on('click', '.btn.randomize', this.handleRandomize.bind(this)).
-      on('click', '.btn.genocide', this.handleGenocide.bind(this)).
-      on('click', '.btn.speed-up', this.handleSpeedUp.bind(this)).
-      on('click', '.btn.slow-down', this.handleSlowDown.bind(this)).
-      on('click', '.btn.speed-reset', this.handleSpeedReset.bind(this)).
+      on('click', '.btn.genocide', this.handleGenocide).
+      on('click', '.btn.play', this.handlePlayPause).
+      on('click', '.btn.randomize', this.handleRandomize).
+      on('click', '.btn.speed-down', this.handleSpeedDown).
+      on('click', '.btn.speed-reset', this.handleSpeedReset).
+      on('click', '.btn.speed-up', this.handleSpeedUp).
+      on('click', '.btn.toggler', this.handleToggler).
       appendTo(document.body);
   }
 
@@ -122,39 +130,46 @@ export default class Controls {
     return this.btns[name];
   }
 
-  updateGeneration () {
-    this.el.find('.generation-count').text(this.game.generations());
+  updateGenerationCount (count) {
+    this.el.find('.generation-count').text(count);
   }
 
   handleToggler () {
     this.el.toggleClass('expanded');
-    this.btns.toggler.find('.glyphicon').toggleClass('glyphicon-cog');
-    this.btns.toggler.find('.glyphicon').toggleClass('glyphicon-remove');
+    this.btns.toggler.find('.glyphicon').
+      toggleClass('glyphicon-cog glyphicon-remove');
   }
 
-  handlePlay () {
-    this.game.playing();
-    this.btns.play.find('.glyphicon').toggleClass('glyphicon-play');
-    this.btns.play.find('.glyphicon').toggleClass('glyphicon-pause');
+  handlePlayPause () {
+    let icon = this.btns.play.find('.glyphicon');
+    if (icon.hasClass('glyphicon-play')) {
+      icon.removeClass('glyphicon-play');
+      icon.addClass('glyphicon-pause');
+      this.emit('play');
+    } else {
+      icon.addClass('glyphicon-play');
+      icon.removeClass('glyphicon-pause');
+      this.emit('pause');
+    }
   }
 
   handleRandomize () {
-    this.game.randomize();
+    this.emit('randomize');
   }
 
   handleGenocide () {
-    this.game.genocide();
+    this.emit('genocide');
   }
 
   handleSpeedUp () {
-    this.game.speedUp(75);
+    this.emit('speed-up', SPEED_INCREMENT);
   }
 
-  handleSlowDown () {
-    this.game.slowDown(75);
+  handleSpeedDown () {
+    this.emit('speed-down', -SPEED_INCREMENT);
   }
 
   handleSpeedReset () {
-    this.game.speed();
+    this.emit('speed-reset');
   }
 }
