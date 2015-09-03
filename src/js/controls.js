@@ -20,9 +20,9 @@ export default class Controls extends Base {
     super(args);
 
     this.bindMethods([
-      'handleGenocide', 'handlePlayPause', 'handleRandomize',
-      'handleSpeedDown', 'handleSpeedReset', 'handleSpeedUp',
-      'handleToggler', 'updateGenerationCount',
+      'handleExplanation', 'handleGenocide', 'handlePlayPause',
+      'handleRandomize', 'handleSpeedDown', 'handleSpeedReset',
+      'handleSpeedUp', 'handleToggler', 'updateGenerationCount',
     ]);
 
     this.el = $('<div>', {'class': 'controls'}).
@@ -36,18 +36,20 @@ export default class Controls extends Base {
       })).
       append(`
         <div class="section explanation">
-          <h1>What is this?</h1>
-          <p>
-            <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">
-            Conway's Game of Life</a> is a cellular automaton. It is not a
-            "game" in the usual sense; rather, the player sets up initial
-            conditions for simulated life to evolve and lets the automaton take
-            over.
-          </p>
-          <p>
-            Click the squares to toggle their state - or choose predefined
-            states using the controls below.
-          </p>
+          <h1><a class="explanation-toggle" href="#" data-target=".explanation .content">What is this?</a></h1>
+          <div class="content hidden">
+            <p>
+              <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">
+              Conway's Game of Life</a> is a cellular automaton. It is not a
+              "game" in the usual sense; rather, the player sets up initial
+              conditions for simulated life to evolve and lets the automaton take
+              over.
+            </p>
+            <p>
+              Click the squares to toggle their state - or choose predefined
+              states using the controls below.
+            </p>
+          </div>
         </div>
         <div class="section generations">
           <h1>Generations</h1>
@@ -86,6 +88,7 @@ export default class Controls extends Base {
         title: 'Reduce speed'
       })).
       end().
+      on('click', '.explanation-toggle', this.handleExplanation).
       on('click', '.btn.genocide', this.handleGenocide).
       on('click', '.btn.play', this.handlePlayPause).
       on('click', '.btn.randomize', this.handleRandomize).
@@ -132,6 +135,11 @@ export default class Controls extends Base {
 
   updateGenerationCount (count) {
     this.el.find('.generation-count').text(count);
+  }
+
+  handleExplanation (e) {
+    e.preventDefault();
+    this.el.find($(e.currentTarget).data('target')).toggleClass('hidden');
   }
 
   handleToggler () {

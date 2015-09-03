@@ -26,7 +26,12 @@ a {
   color: @color-link;
   text-decoration: underline;
 
-  &:hover, &:active, &:focus {
+  // Override bootstrap-glyphicons.
+  &:focus {
+    color: @color-link;
+  }
+
+  &:active, &:hover {
     color: @color-link;
     text-decoration: none;
   }
@@ -34,6 +39,10 @@ a {
 
 h1, h2, h3, h4, h5, h6 {
   color: @color-head;
+}
+
+.hidden {
+  display: none;
 }
 
 .grid {
