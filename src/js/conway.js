@@ -39,7 +39,7 @@ class Conway extends Base {
       'speed', 'speedDown', 'speedUp', 'tick',
     ]);
 
-    this.on('tick', controls.updateGenerationCount);
+    this.on('generation', controls.updateGenerationCount);
 
     controls.
       on('genocide', this.genocide).
@@ -53,6 +53,21 @@ class Conway extends Base {
       on('speed-up', this.speedUp);
 
     $(window).on('resize', view.resize);
+  }
+
+  /**
+   * Get/set the generation count.
+   *
+   * @param  {Number} [i]
+   * @return {Number}
+   */
+  generation (i) {
+    let tick = store.get(this).tick;
+    if (_.isFinite(i) && i >= 0) {
+      tick.count = i;
+      this.emit('generation', i);
+    }
+    return tick.count;
   }
 
   /**
@@ -79,6 +94,7 @@ class Conway extends Base {
    * @method genocide
    */
   genocide (...args) {
+    this.generation(0);
     store.get(this).model.genocide(...args);
   }
 
@@ -90,6 +106,7 @@ class Conway extends Base {
    *         A number from zero to one, representing the ratio of living cells.
    */
   randomize (...args) {
+    this.generation(0);
     store.get(this).model.randomize(...args);
   }
 
@@ -134,10 +151,9 @@ class Conway extends Base {
   tick (timestamp) {
     let data = store.get(this);
     if (data.playing && timestamp - data.tick.timestamp >= data.tick.speed) {
-      data.tick.count++;
-      data.model.tick();
       data.tick.timestamp = timestamp;
-      this.emit('tick', data.tick.count);
+      data.model.tick();
+      this.generation(data.tick.count + 1);
     }
     window.requestAnimationFrame(this.tick);
   }
