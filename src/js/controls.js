@@ -110,6 +110,7 @@ export default class Controls extends Base {
     this.btns = this.btns || {};
 
     this.btns[name] = $('<span>', {
+      role: 'button',
       'class': [
         'btn',
         name,
